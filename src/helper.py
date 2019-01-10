@@ -1,3 +1,4 @@
+from config import *
 import pandas as pd 
 import numpy as np
 import random
@@ -153,3 +154,9 @@ def mapk(actual, predicted, k=5):
             The mean average precision at k over the input lists
     """
     return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
+
+
+def process_test_data(filename):
+    df = pd.read_csv(filename)
+    df = feature_generation(df)
+    df.to_json('../data/prediction_data.json', orient='values')
