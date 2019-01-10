@@ -85,7 +85,7 @@ def main(downsample=True):
         # Validate model
         preds_probability = m.apply(X_test)
         sorted_probabilities = helper.get_top_n_class_predictions(
-            m.model, X_test, y_test, n=5)
+            m.model, preds_probability, n=5)
         test_actual = [[l] for l in y_test['hotel_cluster']]
         score = helper.mapk(test_actual, sorted_probabilities, k=5)
         print('Model Mean Absolute Precision: ', score)
