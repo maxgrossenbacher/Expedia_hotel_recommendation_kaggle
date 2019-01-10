@@ -26,8 +26,9 @@ random.seed(2394)
 
 
 class Model(object):
-    def __init__(self, model_folder ='model' , model_params =MODEL_PARAMS):
+    def __init__(self, model_folder ='model' , model_params =MODEL_PARAMS, model_name=None):
         print('[model]: initialize model training')
+        self.model_name = model_name
         self.model_params =model_params
         self.model_folder =model_folder
         self.target =None
@@ -218,8 +219,16 @@ class Model(object):
         print('\t[model]: saving model and features list')
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
-        pickle.dump(self.features, open(self.model_folder+'/features_{}.p'.format(date), 'wb'))
-        pickle.dump(self.model, open(self.model_folder +'/xgboost_model_{}.p'.format(date), 'wb'))
+        if self.model_name:
+            pickle.dump(self.features, open(self.model_folder +
+                                            '/features_{}.p'.format(self.model_name), 'wb'))
+            pickle.dump(self.model, open(self.model_folder +
+                                         '/{}.pkl'.format(self.model_name), 'wb'))
+        else:
+            pickle.dump(self.features, open(self.model_folder +
+                                            '/features_{}.p'.format(date), 'wb'))
+            pickle.dump(self.model, open(self.model_folder +
+                                         '/xgboost_model_{}.pkl'.format(date), 'wb'))
         pass
 
     def simple_train(self, eval_metric=['rmse']):
@@ -239,10 +248,16 @@ class Model(object):
         print('\t[model]: saving model and features list')
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
-        pickle.dump(self.features, open(self.model_folder +
-                                        '/features_{}.p'.format(date), 'wb'))
-        pickle.dump(self.model, open(self.model_folder +
-                                     '/xgboost_model_{}.p'.format(date), 'wb'))
+        if self.model_name:
+            pickle.dump(self.features, open(self.model_folder +
+                                            '/features_{}.p'.format(self.model_name), 'wb'))
+            pickle.dump(self.model, open(self.model_folder +
+                                         '/{}.pkl'.format(self.model_name), 'wb'))
+        else:
+            pickle.dump(self.features, open(self.model_folder +
+                                            '/features_{}.p'.format(date), 'wb'))
+            pickle.dump(self.model, open(self.model_folder +
+                                         '/xgboost_model_{}.pkl'.format(date), 'wb'))
         pass
 
     def load_model(self, model_filepath, features_filepath):
@@ -458,10 +473,16 @@ class ClassificationModel(Model):
         print('\t[model]: saving model and features list')
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
-        pickle.dump(self.features, open(self.model_folder +
-                                        '/features_{}.p'.format(date), 'wb'))
-        pickle.dump(self.model, open(self.model_folder +
-                                     '/xgboost_model_{}.p'.format(date), 'wb'))
+        if self.model_name:
+            pickle.dump(self.features, open(self.model_folder +
+                                            '/features_{}.p'.format(self.model_name), 'wb'))
+            pickle.dump(self.model, open(self.model_folder +
+                                         '/{}.pkl'.format(self.model_name), 'wb'))
+        else:
+            pickle.dump(self.features, open(self.model_folder +
+                                            '/features_{}.p'.format(date), 'wb'))
+            pickle.dump(self.model, open(self.model_folder +
+                                         '/xgboost_model_{}.pkl'.format(date), 'wb'))
         pass
 
     def apply(self, data, probailities=False):
