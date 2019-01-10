@@ -19,7 +19,7 @@ __status__ = "Production"
 def main(downsample=True):
     print('[main]: running main.py')
     # Train model
-    print('[config]: Train Flag: ', TRAIN_FLAG)
+    print('[config]: train flag: ', TRAIN_FLAG)
     if TRAIN_FLAG == True:
         # Loading data
         print('[config]: destinations csv path: ', DESTINATION)
@@ -56,7 +56,7 @@ def main(downsample=True):
         # Validate model
         preds_probability = m.model.predict_proba(m.X_val[m.features])
         sorted_probabilities = helper.get_top_n_class_predictions(
-            m.model, m.X_val, m.y_val, n=5)
+            m.model, preds_probability, n=5)
         val_actual = [[l] for l in m.y_val['hotel_cluster']]
         score = helper.mapk(val_actual, sorted_probabilities, k=5)
         print('Model Mean Absolute Precision: ', score)

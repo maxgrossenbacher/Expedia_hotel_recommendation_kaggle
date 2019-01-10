@@ -90,7 +90,7 @@ def train_validation_split(df):
     validation_df = validation_df[validation_df['is_booking'] == True]
     return train_df, validation_df
 
-def get_top_n_class_predictions(model, X_test, y_test, n=5):
+def get_top_n_class_predictions(model, preds_probability, n=5):
     results_df = pd.DataFrame(
         columns=model.classes_, data=preds_probability)
     sorted_probabilities = np.flip(results_df.values.argsort(), 1)
