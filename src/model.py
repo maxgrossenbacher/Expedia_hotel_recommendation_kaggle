@@ -27,7 +27,7 @@ random.seed(2394)
 
 class Model(object):
     def __init__(self, model_folder ='model' , model_params =MODEL_PARAMS):
-        print('[model]: Initialize model training')
+        print('[model]: initialize model training')
         self.model_params =model_params
         self.model_folder =model_folder
         self.target =None
@@ -42,14 +42,14 @@ class Model(object):
 
     def _build_model(self):
         if self.model_params:
-            print('\t[model]: Building model using params in config.py')
+            print('\t[model]: building model using params in config.py')
             # build regression model according to passed parameters in the config.py file
             self.model =xgb.XGBRegressor(
                                             base_score= np.mean(self.y_train),
                                             **self.model_params
                                             )
         else:
-            print('\t[model]: Building default model')
+            print('\t[model]: building default model')
             # build default regression model
             self.model =xgb.XGBRegressor(n_estimators=1000000,
                                             base_score= np.mean(self.y_train)
@@ -87,6 +87,7 @@ class Model(object):
         if isinstance(data, pd.DataFrame) and target in data.columns:
             self.y_train = data.pop(target)
             self.X_train = data
+            self.features = self.X_train.columns
         else:
             print(
                 'Data or Target Error: data is not a pd.DataFrame or target not in data columns')
@@ -149,7 +150,7 @@ class Model(object):
         if 'split' in non_numerical_df.columns:
             non_numerical_df.drop('split', axis=1, inplace=True)
         temp.drop(non_numerical_df.columns, axis=1, inplace=True)
-        print('\t[model]: fitting Label Encoder')
+        print('\t[model]: fitting label encoder')
         self.label_encode_dict = defaultdict(LabelEncoder)
         # Encoding the variable
         label_encoded_df = non_numerical_df.apply(lambda x: self.label_encode_dict[x.name].fit_transform(x))
@@ -158,7 +159,7 @@ class Model(object):
         return pd.concat([temp, label_encoded_df], axis=1)
 
     def _split(self):
-        print('\t[model]: Applying Train-Validation-Test split')
+        print('\t[model]: applying train-validation-test split')
         # filter on split column
         train =self.encoded_data[self.encoded_data['split'] =='Train']
         validation =self.encoded_data[self.encoded_data['split'] =='Validation']
@@ -206,15 +207,15 @@ class Model(object):
         # create xgboost model
         self._build_model()
         # train/fit xgboost model to training set, evaluation on validation set
-        print('\t[model]: Training model')
+        print('\t[model]: training model')
         self.model.fit(self.X_train[self.features].values,
                         self.y_train,
                         eval_set =[(self.X_train[self.features].values, self.y_train),(self.X_val[self.features].values, self.y_val)],
                         eval_metric =eval_metric,
-                        verbose =1000,
+                        verbose =10,
                         early_stopping_rounds =100
                         )
-        print('\t[model]: Saving model and features list')
+        print('\t[model]: saving model and features list')
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
         pickle.dump(self.features, open(self.model_folder+'/features_{}.p'.format(date), 'wb'))
@@ -222,9 +223,11 @@ class Model(object):
         pass
 
     def simple_train(self, eval_metric=['rmse']):
+        # get date to append to save_model name
+        date = datetime.datetime.today().strftime('%Y-%m-%d-%H')
         self._build_model()
         # train/fit xgboost model to training set, evaluation on validation set
-        print('\t[model]: Training model')
+        print('\t[model]: training model')
         self.model.fit(self.X_train[self.features].values,
                        self.y_train,
                        eval_set=[(self.X_train[self.features].values, self.y_train),
@@ -233,7 +236,7 @@ class Model(object):
                        verbose=10,
                        early_stopping_rounds=100
                        )
-        print('\t[model]: Saving model and features list')
+        print('\t[model]: saving model and features list')
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
         pickle.dump(self.features, open(self.model_folder +
@@ -243,7 +246,7 @@ class Model(object):
         pass
 
     def load_model(self, model_filepath, features_filepath):
-        print('\t[model]: Loading model and feature list')
+        print('\t[model]: loading model and feature list')
         self.model = pickle.load(open(model_filepath, 'rb'))
         self.features = pickle.load(open(features_filepath, 'rb'))
         self.model_params = self.model.get_xgb_params()
@@ -251,16 +254,16 @@ class Model(object):
 
     def apply(self, data, probailities=False):
         if self._check_for_model():
-            print('\t[model]: Applying model')
+            print('\t[model]: applying model')
             preds = self.model.predict(data[self.features].values)
             return preds
         else:
-            print('No model found - Please train or load xgboost model')
+            print('No model found - train or load xgboost model')
         pass
 
     def validate(self, metrics=['mae','rmse','mape','explained_variance'],set=['train','val','test'], plot=False, labels=None, save=False, fig_size=(5,5), contour=True):
         if self._check_for_model():
-            print('\t[model]: Applying model')
+            print('\t[model]: applying model')
             for s in set:
                 if isinstance(self.X_test[self.features], pd.DataFrame) and s =='test':
                     self.predictions['test'] = self.model.predict(self.X_test[self.features].values)
@@ -269,10 +272,10 @@ class Model(object):
                 if isinstance(self.X_train[self.features], pd.DataFrame) and s =='train':
                     self.predictions['train'] = self.model.predict(self.X_train[self.features].values)
         else:
-            print('No model found - Please train or load xgboost model')
+            print('No model found - train or load xgboost model')
         self._check_for_predictions()
         if len(self.validated_sets) > 0:
-            print('\t[model]: Validating model')
+            print('\t[model]: validating model')
             for s in self.validated_sets:
                 for m in metrics:
                     if 'mae':
@@ -404,13 +407,13 @@ class ClassificationModel(Model):
 
     def _build_model(self):
         if self.model_params:
-            print('\t[model]: Building model using params in config.py')
+            print('\t[model]: building model using params in config.py')
             # build regression model according to passed parameters in the config.py file
             self.model =xgb.XGBClassifier(
                                             **self.model_params
                                             )
         else:
-            print('\t[model]: Building default model')
+            print('\t[model]: building default model')
             # build default regression model
             self.model =xgb.XGBClassifier(n_estimators=5000, objective='binary:logistic')
         pass
@@ -443,7 +446,7 @@ class ClassificationModel(Model):
         # create xgboost model
         self._build_model()
         # train/fit xgboost model to training set, evaluation on validation set
-        print('\t[model]: Training model')
+        print('\t[model]: training model')
         self.model.fit(self.X_train[self.features].values,
                        self.y_train,
                        eval_set=[(self.X_train[self.features].values, self.y_train),
@@ -452,7 +455,7 @@ class ClassificationModel(Model):
                        verbose=10,
                        early_stopping_rounds=100
                        )
-        print('\t[model]: Saving model and features list')
+        print('\t[model]: saving model and features list')
         if not os.path.exists(self.model_folder):
             os.makedirs(self.model_folder)
         pickle.dump(self.features, open(self.model_folder +
@@ -463,21 +466,21 @@ class ClassificationModel(Model):
 
     def apply(self, data, probailities=False):
         if self._check_for_model() and probailities == False:
-            print('\t[model]: Applying model')
+            print('\t[model]: applying model')
             preds = self.model.predict(data[self.features].values)
             return preds
         elif self._check_for_model() and probailities == True:
-            print('\t[model]: Applying model')
+            print('\t[model]: applying model')
             preds = self.model.predict_proba(data[self.features].values)
             return preds
         else:
-            print('No model found - Please train or load xgboost model')
+            print('No model found - train or load xgboost model')
         pass
 
     def validate(self, metrics=['precision','recall','f1-score','accuracy'], plot=False):
         self._check_for_predictions()
         if len(self.validated_sets) > 0:
-            print('\t[model]: Validating model')
+            print('\t[model]: validating model')
             for s in self.validated_sets:
                 for m in metrics:
                     if 'precision':

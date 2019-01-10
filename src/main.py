@@ -16,18 +16,23 @@ __maintainer__ = "Max Grossenbacher"
 __email__ = "max.grossenbacher@delvedeeper.com"
 __status__ = "Production"
 
-def main():
+def main(downsample=True):
     print('[main]: running main.py')
     # Train model
     print('[config]: Train Flag: ', TRAIN_FLAG)
     if TRAIN_FLAG == True:
         # Loading data
-        print('[config]: Destinations csv path: ', DESTINATION)
+        print('[config]: destinations csv path: ', DESTINATION)
         destination_df = helper.read_data_local(DESTINATION)
-        print('[config]: Train csv path: ', TRAIN)
+        print('[config]: train csv path: ', TRAIN)
         train_df = helper.read_data_local(TRAIN)
-        print('[config]: Test csv path: ', TEST)
+        print('[config]: test csv path: ', TEST)
         test_df = helper.read_data_local(TEST)
+
+        # Sample data
+        if downsample:
+            print('[main]: downsampling training data for quicker training')
+            train_df = helper.downsample_training_data(train_df, sample_size=10000)
 
         # Feature generation
         print('[main]: feature generation')
@@ -54,12 +59,13 @@ def main():
         val_actual = [[l] for l in m.y_val['hotel_cluster']]
         score = helper.mapk(val_actual, sorted_probabilities, k=5)
         print('Model Mean Absolute Precision: ', score)
+
     # Apply model
     elif TRAIN_FLAG == False and os.path.isfile(MODEL_DIR+MODEL_NAME):
         # Loading data
-        print('[config]: Destinations csv path: ', DESTINATION)
+        print('[config]: destinations csv path: ', DESTINATION)
         destination_df = helper.read_data_local(DESTINATION)
-        print('[config]: Test csv path: ', TEST)
+        print('[config]: test csv path: ', TEST)
         test_df = helper.read_data_local(TEST)
         # Feature generation
         print('[main]: feature generation')

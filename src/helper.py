@@ -35,6 +35,15 @@ def read_data_cloud(filename):
         print('\t[helper:read_data_cloud]: no data_time column')
         return df
 
+def downsample_training_data(df, sample_size=10000):
+    print('\t[helper:downsample_training_data]: downsample to {} samples'.format(
+        sample_size))
+    unique_users = set(df['user_id'].unique())
+    sel_user_ids = random.sample(unique_users, sample_size)
+    df = df[df.user_id.isin(sel_user_ids)]
+    df.to_csv('../data/sampled_data.csv')
+    return df
+
 def pca_features(df, components=4):
     print('\t[helper:pca_features]: fitting PCA features')
     pca = PCA(n_components=components)
