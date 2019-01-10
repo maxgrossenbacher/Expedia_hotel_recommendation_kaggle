@@ -223,7 +223,7 @@ class Model(object):
             pickle.dump(self.features, open(self.model_folder +
                                             '/features_{}.p'.format(self.model_name), 'wb'))
             pickle.dump(self.model, open(self.model_folder +
-                                         '/{}.pkl'.format(self.model_name), 'wb'))
+                                         '/{}'.format(self.model_name), 'wb'))
         else:
             pickle.dump(self.features, open(self.model_folder +
                                             '/features_{}.p'.format(date), 'wb'))
@@ -252,7 +252,7 @@ class Model(object):
             pickle.dump(self.features, open(self.model_folder +
                                             '/features_{}.p'.format(self.model_name), 'wb'))
             pickle.dump(self.model, open(self.model_folder +
-                                         '/{}.pkl'.format(self.model_name), 'wb'))
+                                         '/{}'.format(self.model_name), 'wb'))
         else:
             pickle.dump(self.features, open(self.model_folder +
                                             '/features_{}.p'.format(date), 'wb'))
@@ -477,7 +477,7 @@ class ClassificationModel(Model):
             pickle.dump(self.features, open(self.model_folder +
                                             '/features_{}.p'.format(self.model_name), 'wb'))
             pickle.dump(self.model, open(self.model_folder +
-                                         '/{}.pkl'.format(self.model_name), 'wb'))
+                                         '/{}'.format(self.model_name), 'wb'))
         else:
             pickle.dump(self.features, open(self.model_folder +
                                             '/features_{}.p'.format(date), 'wb'))
