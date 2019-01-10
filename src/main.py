@@ -46,7 +46,8 @@ def main(downsample=True):
         print('[main]: training model')
         # Train new model using ClassificationModel class
         m = ClassificationModel(model_folder=MODEL_DIR,
-                                model_params=MODEL_PARAMS)
+                                model_params=MODEL_PARAMS,
+                                model_name=MODEL_NAME)
         m.load_train_data(data=train_df, target='hotel_cluster')
         m.load_validation_data(data=validation_df, target='hotel_cluster')
         m.load_test_data(data=test_df, target='hotel_cluster')
