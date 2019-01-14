@@ -43,6 +43,9 @@ def main(downsample=True):
             test_df, destination_df)  # feature generation on test_df
         print('[main]: train-validation split')
         train_df, validation_df = helper.train_validation_split(train_df)
+        # drop columns not in test set
+        train_df.drop(['is_booking','cnt'], axis=1, inplace=True)
+        validation_df.drop(['is_booking','cnt'], axis=1, inplace=True)
         print('[main]: training model')
         # Train new model using ClassificationModel class
         m = ClassificationModel(model_folder=MODEL_DIR,
@@ -54,10 +57,10 @@ def main(downsample=True):
         # Train model
         m.simple_train(eval_metric=['mlogloss'])
         # Validate model
-        preds_probability = m.model.predict_proba(m.X_val[m.features])
+        preds_probability = m.model.predict_proba(m.X_val[m.features].values)
         sorted_probabilities = helper.get_top_n_class_predictions(
             m.model, preds_probability, n=5)
-        val_actual = [[l] for l in m.y_val['hotel_cluster']]
+        val_actual = [[l] for l in m.y_val]
         score = helper.mapk(val_actual, sorted_probabilities, k=5)
         print('Model Mean Absolute Precision: ', score)
 
@@ -83,10 +86,10 @@ def main(downsample=True):
         # Loading trained model
         m.load_model(MODEL_DIR+MODEL_NAME)
         # Validate model
-        preds_probability = m.apply(X_test)
+        preds_probability = m.apply(X_test.values)
         sorted_probabilities = helper.get_top_n_class_predictions(
             m.model, preds_probability, n=5)
-        test_actual = [[l] for l in y_test['hotel_cluster']]
+        test_actual = [[l] for l in y_test]
         score = helper.mapk(test_actual, sorted_probabilities, k=5)
         print('Model Mean Absolute Precision: ', score)
     else:
